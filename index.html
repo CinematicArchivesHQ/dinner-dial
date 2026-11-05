@@ -160,7 +160,7 @@ select option{background:#1E0F45;color:var(--cream)}
 .list li span{color:var(--muted);font-size:.8rem;font-variant-numeric:tabular-nums;white-space:nowrap;align-self:center}
 .list li button{background:none;border:0;text-align:left;padding:0;font-weight:500}
 .list li button:hover{color:var(--peach)}
-footer{font-size:.8rem;color:var(--muted);max-width:68ch;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+footer{font-size:.8rem;color:var(--cream);max-width:68ch;background:rgba(20,11,51,.55);border-radius:14px;padding:12px 14px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 </style>
 </head>
 <body>
@@ -247,73 +247,227 @@ footer{font-size:.8rem;color:var(--muted);max-width:68ch;text-shadow:0 1px 2px r
 </div>
 
 <script>
-// tags: f fancy · q quick bite/fast · d dessert shop · D known for dessert · w waterfront · o outdoor · l late night
+// name | area | cuisine | price 1-4 | stars | tags | lat | lng | blurb
+// tags: f fancy · q quick/fast · d dessert shop · D known for dessert · w waterfront · o outdoor · l late night
 //       b brunch · n date night · k family · v veggie-friendly · m Michelin-recognized · L local legend
+const AREAS=["Fort Lauderdale","Hollywood & Dania Beach","North Miami & Aventura","Mid & North Beach","South Beach","Downtown","Brickell",
+"Wynwood & Edgewater","Design District & Midtown","MiMo & Little River","Little Havana","Coral Gables","Coconut Grove","Key Biscayne",
+"Westchester & South Miami","Kendall & Pinecrest","Homestead & Redland","Key Largo"];
 const R=[
+// Fort Lauderdale
 ["Casa D'Angelo","Fort Lauderdale","Italian",4,4.6,"fn",26.1546,-80.1180,"Tuscan cooking with house-made pastas and a deep wine list."],
 ["Lester's Diner","Fort Lauderdale","American",1,4.4,"lkL",26.0965,-80.1460,"Round-the-clock diner on State Road 84 since 1967. Big plates, bottomless coffee."],
 ["Southport Raw Bar","Fort Lauderdale","Seafood",2,4.5,"wolL",26.1000,-80.1220,"Dockside oysters, conch fritters and cold beer on the Intracoastal."],
+["Kilwins Las Olas","Fort Lauderdale","Dessert",1,4.6,"dk",26.1193,-80.1395,"Fudge, caramel apples and waffle-cone scoops for a Las Olas stroll."],
+["Valentino Cucina Italiana","Fort Lauderdale","Italian",4,4.7,"fn",26.1100,-80.1370,"Chef-driven Italian tasting menus, a longtime local favorite for big nights."],
+["Louie Bossi's","Fort Lauderdale","Italian",3,4.5,"on",26.1190,-80.1390,"Pizza, house-cured salumi and a garden courtyard on Las Olas."],
+["Yolo","Fort Lauderdale","American",3,4.3,"onl",26.1190,-80.1380,"Lively Las Olas patio with fire pits and shareable plates."],
+["Gran Forno Bakery","Fort Lauderdale","Bakery",1,4.6,"dbkv",26.1205,-80.1300,"Italian bakery for focaccia, panini and cannoli."],
+["Old Florida Seafood House","Fort Lauderdale","Seafood",3,4.6,"Ln",26.1580,-80.1390,"Wilton Manors seafood house serving fresh fish since the '80s."],
+["15th Street Fisheries","Fort Lauderdale","Seafood",3,4.4,"wonL",26.0995,-80.1180,"Marina-side dining where you can feed the tarpon off the dock."],
+["The Floridian","Fort Lauderdale","American",2,4.3,"lbkL",26.1195,-80.1370,"Las Olas diner known for huge breakfasts at any hour."],
+["Wild Sea Oyster Bar","Fort Lauderdale","Seafood",3,4.6,"n",26.1192,-80.1360,"Small Las Olas oyster bar with a raw bar and refined seafood plates."],
+["Boatyard","Fort Lauderdale","Seafood",3,4.5,"wonb",26.1000,-80.1260,"Big waterfront seafood room on the 17th Street Causeway."],
 ["Coconuts","Fort Lauderdale","Seafood",3,4.5,"wonb",26.1220,-80.1062,"Intracoastal patio with yachts drifting past. Go at golden hour."],
 ["Shooters Waterfront","Fort Lauderdale","American",3,4.4,"wob",26.1460,-80.1070,"Boat-up dining and a busy weekend brunch."],
-["Kilwins Las Olas","Fort Lauderdale","Dessert",1,4.6,"dk",26.1193,-80.1395,"Fudge, caramel apples and waffle-cone scoops for a Las Olas stroll."],
-["Jaxson's Ice Cream Parlor","Dania Beach","Dessert",2,4.6,"dkL",26.0525,-80.1440,"Old-time parlor since 1956, home of the Kitchen Sink sundae."],
-["Le Tub Saloon","Hollywood","Burgers",2,4.4,"woL",26.0077,-80.1207,"Ramshackle waterfront burger shack famous for its sirloin burger."],
-["Billy's Stone Crab","Hollywood","Seafood",3,4.4,"wo",26.0115,-80.1205,"Stone crabs and seafood towers by the Hollywood Blvd bridge."],
+["Kaluz","Fort Lauderdale","American",3,4.5,"won",26.1880,-80.1050,"Intracoastal views and a wide-ranging menu from sushi to steak."],
+["Steak 954","Fort Lauderdale","Steakhouse",4,4.4,"fwn",26.1350,-80.1025,"Oceanfront steakhouse in the W with a glowing jellyfish tank."],
+["Casablanca Cafe","Fort Lauderdale","Mediterranean",3,4.4,"won",26.1290,-80.1035,"Mediterranean plates in a historic house facing the beach."],
+["Elbo Room","Fort Lauderdale","American",2,4.3,"olL",26.1192,-80.1047,"Classic beach bar on A1A since 1938, with wings and live music."],
+["Cafe Martorano","Fort Lauderdale","Italian",3,4.4,"l",26.1660,-80.1010,"Loud, family-style Italian with a DJ and famous meatballs."],
+// Hollywood & Dania Beach
+["Jaxson's Ice Cream Parlor","Hollywood & Dania Beach","Dessert",2,4.6,"dkL",26.0525,-80.1440,"Old-time parlor since 1956, home of the Kitchen Sink sundae."],
+["Le Tub Saloon","Hollywood & Dania Beach","Burgers",2,4.4,"woL",26.0077,-80.1207,"Ramshackle waterfront burger shack famous for its sirloin burger."],
+["Billy's Stone Crab","Hollywood & Dania Beach","Seafood",3,4.4,"wo",26.0115,-80.1205,"Stone crabs and seafood towers by the Hollywood Blvd bridge."],
+["Taverna Opa","Hollywood & Dania Beach","Greek",3,4.3,"wol",26.0080,-80.1180,"Greek mezze, dancing on tables and plate-smashing nights."],
+["Tarks of Dania Beach","Hollywood & Dania Beach","Seafood",2,4.5,"qL",26.0540,-80.1440,"Counter-style clam bar for fried clams, wings and conch."],
+["GG's Waterfront","Hollywood & Dania Beach","American",3,4.4,"won",26.0260,-80.1200,"Intracoastal dock dining with sunset views."],
+["Ocean Alley","Hollywood & Dania Beach","Seafood",2,4.4,"wok",26.0140,-80.1180,"Casual seafood right on the Hollywood Broadwalk."],
+["JWB Prime Steak and Seafood","Hollywood & Dania Beach","Steakhouse",4,4.5,"fn",26.0130,-80.1180,"Polished steakhouse at Margaritaville Hollywood Beach."],
+["Taco Beach Shack","Hollywood & Dania Beach","Mexican",2,4.4,"qol",26.0110,-80.1180,"Beachside tacos and frozen margaritas in a laid-back yard."],
+["Monkitail","Hollywood & Dania Beach","Japanese",4,4.4,"fnl",25.9970,-80.1180,"Izakaya-style Japanese with sushi and robata at the Diplomat."],
+// North Miami & Aventura
+["Gourmet Diner","North Miami & Aventura","French",2,4.5,"Lk",25.9300,-80.1580,"A 1950s dining car serving French bistro food. Quirky and great."],
+["Bourbon Steak","North Miami & Aventura","Steakhouse",4,4.6,"fn",25.9600,-80.1420,"Michael Mina's steakhouse at JW Marriott Turnberry."],
+["Il Mulino","North Miami & Aventura","Italian",4,4.5,"fwn",25.9600,-80.1210,"Old-school Italian with ocean views at Acqualina in Sunny Isles."],
+["Bocas House","North Miami & Aventura","Venezuelan",2,4.6,"k",25.9580,-80.1440,"Venezuelan grill for arepas, cachapas and big burgers."],
+["Captain Jim's Seafood","North Miami & Aventura","Seafood",2,4.5,"kL",25.8930,-80.1870,"No-frills fish market and restaurant, fresh off the boats."],
+["Laurenzo's Italian Market","North Miami & Aventura","Italian",2,4.6,"kL",25.9290,-80.1610,"Family Italian market with a deli, pizza and imported groceries."],
+["Mo's Bagels & Deli","North Miami & Aventura","Deli",2,4.4,"bkL",25.9590,-80.1470,"Classic Jewish deli for bagels, smoked fish and pastrami."],
+["Hiro's Yakko-San","North Miami & Aventura","Japanese",2,4.6,"lL",25.9295,-80.1420,"Late-night Japanese comfort food that chefs go to after their shifts."],
+["Paquito's","North Miami & Aventura","Mexican",2,4.4,"kL",25.9265,-80.1550,"Colorful family Mexican spot running for decades on Biscayne."],
+["Blue Marlin Fish House","North Miami & Aventura","Seafood",2,4.4,"wok",25.9200,-80.1360,"Smoked fish dip and sandwiches by the river in Oleta River State Park."],
+// Mid & North Beach
+["The Surf Club Restaurant","Mid & North Beach","Steakhouse",4,4.6,"fnm",25.8768,-80.1209,"Thomas Keller's mid-century supper club. Dress up."],
+["Le Sirenuse","Mid & North Beach","Italian",4,4.5,"fn",25.8770,-80.1210,"Amalfi Coast Italian under the palms at the Four Seasons Surf Club."],
+["Taquiza","Mid & North Beach","Mexican",1,4.5,"qov",25.8580,-80.1200,"Blue-corn masa tacos a block from the sand."],
+["Josh's Deli","Mid & North Beach","Deli",2,4.6,"bL",25.8790,-80.1240,"Chef-run deli with house-cured pastrami and smoked fish."],
+["Cafe Prima Pasta","Mid & North Beach","Italian",2,4.6,"kL",25.8590,-80.1215,"North Beach Argentine-Italian trattoria with fresh pasta."],
+["Lido at The Standard","Mid & North Beach","Mediterranean",3,4.4,"wobv",25.7950,-80.1490,"Bayside Mediterranean at the Standard Spa. Great for brunch."],
+["Los Fuegos","Mid & North Beach","Argentine",4,4.4,"fn",25.8155,-80.1225,"Francis Mallmann's wood-fire Argentine grill at Faena."],
+["Makoto","Mid & North Beach","Japanese",4,4.5,"fn",25.8880,-80.1250,"Polished sushi and robata at Bal Harbour Shops."],
+["Carpaccio","Mid & North Beach","Italian",3,4.5,"on",25.8880,-80.1250,"Long-running Italian with a garden patio at Bal Harbour Shops."],
+["Indomania","Mid & North Beach","Indonesian",3,4.7,"nv",25.8020,-80.1280,"Intimate Indonesian; order the rijsttafel feast."],
+// South Beach
 ["Joe's Stone Crab","South Beach","Seafood",4,4.6,"fDLn",25.7688,-80.1351,"Miami Beach since 1913. Stone crabs are in season now, and the Key lime pie is a must."],
 ["Prime 112","South Beach","Steakhouse",4,4.5,"fnl",25.7712,-80.1335,"Scene-y steakhouse with dry-aged cuts and a crowd to match."],
 ["Carbone","South Beach","Italian",4,4.5,"fn",25.7716,-80.1345,"Old-school red-sauce glamour; spicy rigatoni is the order."],
+["Stubborn Seed","South Beach","American",4,4.6,"fnm",25.7700,-80.1350,"Michelin-starred tasting menus from chef Jeremy Ford."],
+["Smith & Wollensky","South Beach","Steakhouse",4,4.4,"fwn",25.7685,-80.1360,"Steaks with a South Pointe waterfront view of the cruise ships."],
 ["Puerto Sagua","South Beach","Cuban",1,4.5,"klL",25.7752,-80.1330,"Counter-and-booth Cuban diner serving ropa vieja since 1962."],
 ["11th Street Diner","South Beach","American",2,4.3,"lkb",25.7795,-80.1330,"Art Deco dining car serving breakfast at any hour."],
 ["La Sandwicherie","South Beach","Sandwiches",1,4.6,"qlLv",25.7848,-80.1327,"Walk-up French sandwich bar open late. Get the vinaigrette."],
 ["Yardbird Southern Table","South Beach","Southern",3,4.6,"bn",25.7901,-80.1393,"Fried chicken and waffles with bourbon cocktails."],
-["Lucali","Sunset Harbour","Pizza",3,4.6,"nk",25.7930,-80.1440,"Candlelit Brooklyn-style pies and calzones."],
-["The Surf Club Restaurant","Surfside","Steakhouse",4,4.6,"fnm",25.8768,-80.1209,"Thomas Keller's mid-century supper club. Dress up."],
-["Taquiza","North Beach","Mexican",1,4.5,"qov",25.8580,-80.1200,"Blue-corn masa tacos a block from the sand."],
+["Lucali","South Beach","Pizza",3,4.6,"nk",25.7930,-80.1440,"Candlelit Brooklyn-style pies and calzones in Sunset Harbour."],
+["Macchialina","South Beach","Italian",3,4.6,"n",25.7720,-80.1340,"Cozy rustic Italian with house-made pasta."],
+["Byblos","South Beach","Mediterranean",3,4.5,"nv",25.7900,-80.1290,"Eastern Mediterranean plates in a bright, buzzy room."],
+["Pura Vida","South Beach","Café",2,4.6,"bvq",25.7820,-80.1310,"Smoothie bowls, wraps and coffee for a healthy beach day."],
+["Frieze Ice Cream Factory","South Beach","Dessert",1,4.6,"dk",25.7900,-80.1340,"Homemade ice cream and sorbet near Lincoln Road."],
+// Downtown
 ["CVI.CHE 105","Downtown","Peruvian",2,4.6,"n",25.7765,-80.1880,"Ceviches and lomo saltado in a bright, buzzy room."],
-["La Mar by Gastón Acurio","Brickell Key","Peruvian",4,4.5,"fwon",25.7675,-80.1855,"Peruvian seafood with a waterfront terrace facing the skyline."],
+["Il Gabbiano","Downtown","Italian",4,4.6,"fwn",25.7770,-80.1860,"White-tablecloth Italian on Biscayne Bay."],
+["Zuma","Downtown","Japanese",4,4.5,"fwn",25.7710,-80.1890,"Izakaya-style Japanese on the Miami River at the Epic Hotel."],
+["Area 31","Downtown","Seafood",3,4.4,"wn",25.7710,-80.1890,"16th-floor seafood with skyline and bay views."],
+["Garcia's Seafood Grille & Fish","Downtown","Seafood",2,4.5,"woL",25.7775,-80.2045,"Family fish market with a dockside deck on the Miami River."],
+["Kiki on the River","Downtown","Greek",4,4.5,"wonl",25.7790,-80.2080,"Greek seafood and a party scene right on the Miami River."],
+["Seaspice","Downtown","Seafood",4,4.4,"won",25.7790,-80.2090,"Riverside seafood with a dock for boaters."],
+["Verde at PAMM","Downtown","American",2,4.3,"wov",25.7860,-80.1860,"Museum café with a bayfront terrace under hanging gardens."],
+["All Day","Downtown","Café",1,4.6,"qbv",25.7840,-80.1950,"Top-tier coffee and all-day breakfast."],
+["Cafe Bastille","Downtown","French",2,4.5,"bk",25.7720,-80.1890,"French brunch spot for crêpes and eggs Benedict."],
+// Brickell
 ["Komodo","Brickell","Asian",4,4.4,"fnl",25.7682,-80.1922,"Three-level Southeast Asian spot with bird's-nest booths."],
-["Garcia's Seafood Grille & Fish","Miami River","Seafood",2,4.5,"woL",25.7775,-80.2045,"Family fish market with a dock-side deck on the Miami River."],
-["Kyu","Wynwood","Asian",3,4.6,"nv",25.8012,-80.1992,"Wood-fired Asian plates; the roasted cauliflower converts skeptics."],
-["Coyo Taco","Wynwood","Mexican",1,4.5,"qlo",25.8005,-80.1985,"Fast tacos up front, a hidden bar in the back."],
-["Bakan","Wynwood","Mexican",3,4.6,"on",25.8006,-80.1999,"Mezcal bar and wood-fired Mexican in a cactus garden."],
-["The Salty Donut","Wynwood","Dessert",1,4.6,"d",25.8020,-80.1995,"Small-batch brioche doughnuts in rotating flavors."],
-["Zak the Baker","Wynwood","Bakery",1,4.6,"dvb",25.8016,-80.1960,"Kosher bakery with naturally leavened bread and pastries."],
-["Kush","Wynwood","Burgers",2,4.6,"lL",25.7970,-80.1950,"Craft beer and the Frita burger with guava jelly."],
-["Chef Creole","Little Haiti","Haitian",1,4.4,"okL",25.8295,-80.1955,"Griot, conch and fried snapper from an open-air spot."],
-["Michael's Genuine Food & Drink","Design District","American",3,4.5,"Dobn",25.8130,-80.1930,"Seasonal Florida cooking with a pastry program people come back for."],
-["Mandolin Aegean Bistro","Buena Vista","Greek",3,4.6,"onv",25.8135,-80.1896,"Greek and Turkish plates in a blue-and-white garden courtyard."],
-["Cote Miami","Design District","Steakhouse",4,4.7,"fnm",25.8125,-80.1925,"Michelin-starred Korean steakhouse with tableside grills."],
-["L'Atelier de Joël Robuchon","Design District","French",4,4.7,"fnmD",25.8128,-80.1935,"Counter-side French tasting menus and showpiece desserts."],
+["Cantina La Veinte","Brickell","Mexican",3,4.5,"won",25.7680,-80.1900,"Upscale Mexican with a waterfront terrace on the river."],
+["Hutong","Brickell","Chinese",4,4.4,"fn",25.7650,-80.1930,"Northern Chinese cooking with dramatic Peking duck."],
+["Edge Steak & Bar","Brickell","Steakhouse",4,4.5,"fon",25.7600,-80.1920,"Four Seasons steakhouse with a calm terrace."],
+["Truluck's","Brickell","Seafood",4,4.6,"fn",25.7650,-80.1900,"Stone crabs and live piano in a polished dining room."],
+["Quinto La Huella","Brickell","Uruguayan",4,4.5,"fon",25.7670,-80.1930,"Wood-fired Uruguayan grill at the East hotel."],
+["River Oyster Bar","Brickell","Seafood",3,4.5,"n",25.7690,-80.1930,"Long-running Brickell oyster bar with a happy hour crowd."],
+["La Moon","Brickell","Colombian",1,4.5,"qlL",25.7600,-80.1940,"Late-night Colombian comfort food for after the bars."],
+["Tacotote","Brickell","Mexican",1,4.5,"qkl",25.7640,-80.1950,"Casual taqueria with tacos al pastor and micheladas."],
+["Momi Ramen","Brickell","Japanese",2,4.6,"q",25.7655,-80.1955,"Tiny cash-only ramen shop with rich, slow-cooked broth."],
+// Wynwood & Edgewater
+["Kyu","Wynwood & Edgewater","Asian",3,4.6,"nv",25.8012,-80.1992,"Wood-fired Asian plates; the roasted cauliflower converts skeptics."],
+["Coyo Taco","Wynwood & Edgewater","Mexican",1,4.5,"qlo",25.8005,-80.1985,"Fast tacos up front, a hidden bar in the back."],
+["Bakan","Wynwood & Edgewater","Mexican",3,4.6,"on",25.8006,-80.1999,"Mezcal bar and wood-fired Mexican in a cactus garden."],
+["The Salty Donut","Wynwood & Edgewater","Dessert",1,4.6,"d",25.8020,-80.1995,"Small-batch brioche doughnuts in rotating flavors."],
+["Zak the Baker","Wynwood & Edgewater","Bakery",1,4.6,"dvb",25.8016,-80.1960,"Kosher bakery with naturally leavened bread and pastries."],
+["Kush","Wynwood & Edgewater","Burgers",2,4.6,"lL",25.7970,-80.1950,"Craft beer and the Frita burger with guava jelly."],
+["Doya","Wynwood & Edgewater","Turkish",3,4.6,"on",25.8000,-80.1990,"Aegean meze and wood-fired dishes in a leafy courtyard."],
+["Uchi","Wynwood & Edgewater","Japanese",4,4.7,"fn",25.8030,-80.1990,"Inventive sushi and Japanese small plates."],
+["Hiyakawa","Wynwood & Edgewater","Japanese",4,4.7,"fn",25.8050,-80.1990,"Serene omakase-style Japanese in a wood-lined room."],
+["Hometown Barbecue","Wynwood & Edgewater","BBQ",2,4.5,"kl",25.7960,-80.2060,"Brooklyn-style smoked meats in Allapattah."],
+["Fireman Derek's","Wynwood & Edgewater","Dessert",1,4.6,"dD",25.8000,-80.1990,"Pie shop started by a firefighter. Try the key lime."],
+["Clive's Cafe","Wynwood & Edgewater","Jamaican",1,4.6,"qL",25.7980,-80.2000,"Jerk chicken and oxtail from a decades-old family counter."],
+// Design District & Midtown
+["Michael's Genuine Food & Drink","Design District & Midtown","American",3,4.5,"Dobn",25.8130,-80.1930,"Seasonal Florida cooking with a pastry program people come back for."],
+["Mandolin Aegean Bistro","Design District & Midtown","Greek",3,4.6,"onv",25.8135,-80.1896,"Greek and Turkish plates in a blue-and-white garden courtyard."],
+["Cote Miami","Design District & Midtown","Steakhouse",4,4.7,"fnm",25.8125,-80.1925,"Michelin-starred Korean steakhouse with tableside grills."],
+["L'Atelier de Joël Robuchon","Design District & Midtown","French",4,4.7,"fnmD",25.8128,-80.1935,"Counter-side French tasting menus and showpiece desserts."],
+["Le Jardinier","Design District & Midtown","French",4,4.6,"fnmv",25.8130,-80.1930,"Vegetable-forward French cooking in a garden-like room."],
+["Ghee Indian Kitchen","Design District & Midtown","Indian",3,4.6,"nv",25.8125,-80.1925,"Modern Indian built on produce from the chef's own farm."],
+["Swan","Design District & Midtown","American",4,4.3,"fonl",25.8125,-80.1930,"Pink-and-green glamour with a scene upstairs at Bar Bevy."],
+["Buena Vista Deli","Design District & Midtown","Bakery",2,4.6,"dbo",25.8150,-80.1910,"French bakery-café for croissants, tarts and sidewalk coffee."],
+["Lemoni Café","Design District & Midtown","Mediterranean",2,4.6,"vbo",25.8170,-80.1920,"Small Buena Vista café for wraps, salads and Greek plates."],
+["Lagniappe","Design District & Midtown","Wine Bar",2,4.6,"onl",25.8070,-80.1900,"Backyard wine bar with live jazz and cheese boards."],
+// MiMo & Little River
+["Chef Creole","MiMo & Little River","Haitian",1,4.4,"okL",25.8295,-80.1955,"Griot, conch and fried snapper from an open-air spot."],
+["Boia De","MiMo & Little River","Italian",3,4.7,"nm",25.8302,-80.1847,"Tiny strip-mall trattoria with a Michelin star. Book early."],
+["Andiamo Brick Oven Pizza","MiMo & Little River","Pizza",2,4.5,"okv",25.8285,-80.1860,"Brick-oven pies in a converted tire shop on Biscayne."],
+["Ogawa","MiMo & Little River","Japanese",4,4.8,"fnm",25.8350,-80.1880,"Michelin-starred kaiseki and omakase in a quiet room."],
+["Phuc Yea","MiMo & Little River","Vietnamese",3,4.5,"onl",25.8410,-80.1840,"Viet-Cajun food on a lantern-lit patio."],
+["Jimmy's Eastside Diner","MiMo & Little River","American",1,4.5,"bkL",25.8330,-80.1840,"Beloved MiMo diner for pancakes and corned beef hash."],
+["Paradis Books & Bread","MiMo & Little River","Bakery",2,4.6,"vbo",25.8400,-80.1960,"Bookstore, natural wine bar and sourdough bakery in one."],
+["Tran An","MiMo & Little River","Vietnamese",2,4.6,"v",25.8400,-80.1940,"Little River Vietnamese for banh mi and noodle bowls."],
+["Mina's Mediterraneo","MiMo & Little River","Mediterranean",3,4.6,"onv",25.8450,-80.1840,"Greek-leaning Mediterranean with a breezy patio."],
+["The Citadel","MiMo & Little River","American",2,4.5,"qok",25.8510,-80.1910,"Food hall with a dozen vendors and a rooftop bar."],
+// Little Havana
 ["Versailles","Little Havana","Cuban",2,4.4,"DLkl",25.7655,-80.2530,"The Cuban institution. Grab a pastelito and cafecito at the window."],
 ["Azucar Ice Cream Company","Little Havana","Dessert",1,4.6,"dLk",25.7655,-80.2192,"Cuban-inspired flavors like Abuela Maria with guava and cream cheese."],
 ["El Exquisito","Little Havana","Cuban",1,4.5,"qk",25.7653,-80.2183,"Calle Ocho counter for Cuban breakfast and lunch specials."],
 ["Ball & Chain","Little Havana","Cuban",2,4.5,"olnL",25.7656,-80.2189,"Live salsa, mojitos and croquetas in a 1935 landmark."],
 ["El Rey de las Fritas","Little Havana","Cuban",1,4.5,"qLk",25.7650,-80.2380,"The Cuban frita: seasoned patty under a pile of shoestring fries."],
-["Boia De","Little River","Italian",3,4.7,"nm",25.8302,-80.1847,"Tiny strip-mall trattoria with a Michelin star. Book early."],
-["Blue Collar","Upper East Side","American",2,4.6,"bk",25.8358,-80.1845,"Comfort cooking on Biscayne; the braised short rib is the move."],
-["Andiamo Brick Oven Pizza","Upper East Side","Pizza",2,4.5,"okv",25.8285,-80.1860,"Brick-oven pies in a converted tire shop on Biscayne."],
-["Glass & Vine","Coconut Grove","American",3,4.4,"obn",25.7275,-80.2387,"Glass-walled spot in Peacock Park under the banyans."],
-["Monty's Raw Bar","Coconut Grove","Seafood",2,4.3,"woL",25.7262,-80.2335,"Tiki-hut raw bar on the bay with a big happy hour."],
-["Ariete","Coconut Grove","American",4,4.6,"fnm",25.7292,-80.2425,"Michelin-starred, Cuban-leaning modern cooking."],
-["Bombay Darbar","Coconut Grove","Indian",2,4.5,"vn",25.7277,-80.2433,"Long-running Grove favorite for curries and tandoori."],
+["Café La Trova","Little Havana","Cuban",3,4.6,"nlL",25.7655,-80.2195,"Award-winning cocktails, live trova music and modern Cuban plates."],
+["Sanguich de Miami","Little Havana","Sandwiches",1,4.7,"qL",25.7655,-80.2170,"Obsessively made Cuban sandwiches with house-cured meats."],
+["La Camaronera","Little Havana","Seafood",2,4.6,"qL",25.7660,-80.2410,"Stand-up fish counter famous for the pan con minuta."],
+["Casa Juancho","Little Havana","Spanish",3,4.5,"nL",25.7656,-80.2370,"Spanish tapas, paella and strolling musicians since 1979."],
+["Los Pinareños Frutería","Little Havana","Dessert",1,4.7,"dqL",25.7656,-80.2160,"Fruit stand for fresh juices, batidos and coconut water."],
+["Lung Yai Thai Tapas","Little Havana","Thai",2,4.6,"n",25.7658,-80.2233,"Fiery Thai small plates in a tiny, always-busy room."],
+// Coral Gables
 ["Pascal's on Ponce","Coral Gables","French",4,4.7,"fnD",25.7460,-80.2600,"Intimate French dining; order the soufflé when you sit down."],
 ["Caffe Abbracci","Coral Gables","Italian",3,4.6,"fn",25.7505,-80.2595,"Gables classic with white tablecloths and attentive service."],
 ["Fritz & Franz Bierhaus","Coral Gables","German",2,4.5,"olk",25.7509,-80.2590,"Schnitzel, giant pretzels and liter steins on Giralda Plaza."],
 ["Threefold Cafe","Coral Gables","Café",2,4.6,"bvo",25.7500,-80.2575,"Australian-style brunch with very good coffee."],
 ["Miss Saigon Bistro","Coral Gables","Vietnamese",2,4.5,"vk",25.7508,-80.2588,"Pho, clay pots and crispy spring rolls."],
-["Rusty Pelican","Virginia Key","Seafood",3,4.5,"wnbo",25.7458,-80.1687,"Bayfront terrace with the best skyline view in town."],
-["Whip 'N Dip Ice Cream","South Miami","Dessert",1,4.7,"dkL",25.7050,-80.2700,"Homemade ice cream on Sunset Drive since 1977."],
-["Shorty's BBQ","Kendall","BBQ",2,4.4,"kL",25.6860,-80.3095,"Ribs and corn on the cob at picnic tables since 1951."],
-["Kon Chau","Bird Road","Chinese",2,4.5,"kv",25.7330,-80.3300,"Dim sum all day from a no-frills strip mall."],
-["Matsuri","Bird Road","Japanese",2,4.6,"k",25.7340,-80.2860,"Where Miami chefs go for sushi on their night off."],
-["Arbetter's Hot Dogs","Bird Road","Hot Dogs",1,4.6,"qkL",25.7330,-80.3200,"Chili dogs and onion rings since 1959."],
-["Gourmet Diner","North Miami Beach","French",2,4.5,"Lk",25.9300,-80.1580,"A 1950s dining car serving French bistro food. Quirky and great."],
-["Black Point Ocean Grill","Cutler Bay","Seafood",2,4.3,"wok",25.5395,-80.3280,"Marina-side fish sandwiches with manatees in the channel."],
-["Knaus Berry Farm","Redland","Dessert",1,4.8,"dLk",25.5410,-80.5055,"Cinnamon rolls worth the line and strawberry milkshakes. Seasonal, closed Sundays."],
-["Schnebly Redland's Winery","Redland","Pizza",2,4.5,"onk",25.5150,-80.4930,"Tropical-fruit wines and brick-oven pizza among the waterfalls."],
-["Robert Is Here","Florida City","Dessert",1,4.7,"dqLk",25.4463,-80.5085,"Fruit stand with legendary key lime and mamey milkshakes."],
-["Shiver's BBQ","Homestead","BBQ",2,4.4,"kL",25.4630,-80.4775,"Pit-smoked ribs and brisket on Krome since 1950."],
-["El Toro Taco","Homestead","Mexican",2,4.5,"kL",25.4730,-80.4770,"Family-run Mexican since 1971. Bring your own beer."],
+["Zitz Sum","Coral Gables","Asian",3,4.7,"nv",25.7520,-80.2580,"Inventive dumplings and pan-Asian small plates."],
+["Ortanique on the Mile","Coral Gables","Caribbean",3,4.6,"fnL",25.7495,-80.2595,"Elegant Caribbean cooking on Miracle Mile for decades."],
+["Bulla Gastrobar","Coral Gables","Spanish",3,4.5,"nb",25.7505,-80.2580,"Spanish tapas, croquetas and sangria."],
+["Fontana at the Biltmore","Coral Gables","Italian",4,4.6,"fon",25.7215,-80.2790,"Italian in the Biltmore's fountain courtyard."],
+["Tinta y Café","Coral Gables","Cuban",1,4.6,"qbk",25.7520,-80.2600,"Cuban café for cafecito, pressed sandwiches and pastries."],
+["Talavera","Coral Gables","Mexican",3,4.5,"n",25.7500,-80.2590,"Mexico City-style cooking with huaraches and mole."],
+["Graziano's","Coral Gables","Argentine",3,4.5,"nk",25.7495,-80.2600,"Argentine steakhouse with a market and wine shop."],
+// Coconut Grove
+["Glass & Vine","Coconut Grove","American",3,4.4,"obn",25.7275,-80.2387,"Glass-walled spot in Peacock Park under the banyans."],
+["Monty's Raw Bar","Coconut Grove","Seafood",2,4.3,"woL",25.7262,-80.2335,"Tiki-hut raw bar on the bay with a big happy hour."],
+["Ariete","Coconut Grove","American",4,4.6,"fnm",25.7292,-80.2425,"Michelin-starred, Cuban-leaning modern cooking."],
+["Bombay Darbar","Coconut Grove","Indian",2,4.5,"vn",25.7277,-80.2433,"Long-running Grove favorite for curries and tandoori."],
+["Navé","Coconut Grove","Italian",3,4.7,"n",25.7300,-80.2380,"Coastal Italian from the Ariete team in a cozy room."],
+["Chug's Diner","Coconut Grove","Cuban",2,4.5,"bk",25.7300,-80.2440,"Cuban-American diner for croqueta breakfasts and Cuban burgers."],
+["Le Bouchon du Grove","Coconut Grove","French",3,4.5,"on",25.7280,-80.2430,"Classic French bistro with sidewalk tables."],
+["Los Félix","Coconut Grove","Mexican",3,4.6,"nmv",25.7300,-80.2425,"Michelin-recognized heirloom-corn Mexican."],
+["Lulu in the Grove","Coconut Grove","American",2,4.3,"ob",25.7280,-80.2425,"Easygoing sidewalk café for brunch and people-watching."],
+["Atchana's Homegrown Thai","Coconut Grove","Thai",2,4.6,"v",25.7280,-80.2400,"Family-run Thai with herbs from their own garden."],
+["Bayshore Club","Coconut Grove","Seafood",3,4.3,"wob",25.7260,-80.2340,"Bayfront deck at Dinner Key Marina."],
+// Key Biscayne
+["Rusty Pelican","Key Biscayne","Seafood",3,4.5,"wnbo",25.7458,-80.1687,"Bayfront terrace with the best skyline view in town."],
+["Boater's Grill","Key Biscayne","Seafood",2,4.4,"wo",25.6810,-80.1610,"Cuban-style seafood at No Name Harbor in Bill Baggs park."],
+["Lightkeepers","Key Biscayne","Seafood",4,4.5,"fwon",25.6950,-80.1610,"Oceanfront seafood at the Ritz-Carlton Key Biscayne."],
+["Cantina Beach","Key Biscayne","Mexican",3,4.4,"wo",25.6950,-80.1610,"Beachside Mexican with a long tequila list."],
+["Novecento Key Biscayne","Key Biscayne","Argentine",3,4.4,"ob",25.6930,-80.1620,"Argentine bistro with steaks, empanadas and a sunny patio."],
+["Costa Med Bistro","Key Biscayne","Mediterranean",2,4.4,"o",25.6930,-80.1620,"Neighborhood Mediterranean on Crandon Blvd."],
+["La Boulangerie Boul'Mich","Key Biscayne","Bakery",2,4.5,"dbk",25.6940,-80.1625,"French bakery-café for pastries and brunch."],
+["Whiskey Joe's","Key Biscayne","American",2,4.2,"wok",25.7460,-80.1690,"Waterfront bar and grill on Virginia Key."],
+["Archie's Pizza","Key Biscayne","Pizza",2,4.5,"k",25.6935,-80.1620,"Island pizza joint everyone on Key Biscayne knows."],
+// Westchester & South Miami
+["Kon Chau","Westchester & South Miami","Chinese",2,4.5,"kv",25.7330,-80.3300,"Dim sum all day from a no-frills strip mall."],
+["Matsuri","Westchester & South Miami","Japanese",2,4.6,"k",25.7340,-80.2860,"Where Miami chefs go for sushi on their night off."],
+["Arbetter's Hot Dogs","Westchester & South Miami","Hot Dogs",1,4.6,"qkL",25.7330,-80.3200,"Chili dogs and onion rings since 1959."],
+["Islas Canarias","Westchester & South Miami","Cuban",2,4.5,"kL",25.7330,-80.4150,"Cuban classics and famous ham croquetas."],
+["Tropical Chinese","Westchester & South Miami","Chinese",2,4.4,"k",25.7330,-80.3170,"Cart-style dim sum on weekends since the '80s."],
+["Sergio's","Westchester & South Miami","Cuban",2,4.3,"kbl",25.7330,-80.3150,"The original location of the Miami Cuban café chain."],
+["El Palacio de los Jugos","Westchester & South Miami","Cuban",1,4.4,"qkL",25.7710,-80.2880,"Open-air market for fresh juices, chicharrón and lechón."],
+["El Mago de las Fritas","Westchester & South Miami","Cuban",1,4.6,"qL",25.7630,-80.2880,"A legendary frita counter that even made it onto TV."],
+["Whip 'N Dip Ice Cream","Westchester & South Miami","Dessert",1,4.7,"dkL",25.7050,-80.2700,"Homemade ice cream on Sunset Drive since 1977."],
+["Two Chefs","Westchester & South Miami","American",3,4.6,"fn",25.7040,-80.2930,"Chef-owned bistro that's been a South Miami staple for decades."],
+["Deli Lane Cafe","Westchester & South Miami","Café",2,4.4,"bk",25.7050,-80.2920,"Sunset Drive brunch spot for omelets and sandwiches."],
+["Fox's Sherron Inn","Westchester & South Miami","American",2,4.5,"lL",25.7000,-80.2930,"Dark, cozy 1946 lounge with stiff drinks and steak."],
+["Town Kitchen & Bar","Westchester & South Miami","American",3,4.4,"obn",25.7010,-80.2860,"Upbeat American with a big brunch and patio."],
+// Kendall & Pinecrest
+["Chef Adrianne's Vineyard","Kendall & Pinecrest","American",3,4.6,"n",25.6880,-80.3960,"Chef-driven plates and a big wine list at The Palms at Town and Country."],
+["Captain's Tavern","Kendall & Pinecrest","Seafood",3,4.6,"Lkn",25.6830,-80.3130,"Family-run since the early '70s: Caribbean-leaning seafood and a deep wine list."],
+["Pinecrest Bakery","Kendall & Pinecrest","Bakery",1,4.5,"dqkL",25.6440,-80.3330,"Cuban bakery for pastelitos, croquetas and a quick cafecito."],
+["Lots of Lox","Kendall & Pinecrest","Deli",2,4.4,"bkL",25.6300,-80.3400,"Old-school deli for bagels, lox and overstuffed sandwiches."],
+["Los Verdes","Kendall & Pinecrest","Colombian",2,4.5,"qk",25.6870,-80.3870,"Colombian street-food favorites like arepas and salchipapas."],
+["Sir Pizza","Kendall & Pinecrest","Pizza",1,4.4,"kL",25.6880,-80.3300,"Thin-crust Miami pizza chain going since the '60s."],
+["Aromas del Peru","Kendall & Pinecrest","Peruvian",2,4.5,"k",25.6870,-80.3720,"Ceviche, lomo saltado and chicha morada."],
+["The Cheesecake Factory","Kendall & Pinecrest","American",3,4.2,"Dk",25.6890,-80.3140,"Dadeland location. Huge menu and even bigger cheesecakes."],
+["Pollo Tropical","Kendall & Pinecrest","Caribbean",1,4.0,"qk",25.6870,-80.3400,"Miami-born grilled chicken with rice, beans and plantains."],
+["Pincho","Kendall & Pinecrest","Burgers",1,4.4,"qk",25.6870,-80.3550,"Local fast-casual for Latin-style burgers and kebabs."],
+["Sushi Maki","Kendall & Pinecrest","Japanese",2,4.3,"k",25.6890,-80.3140,"Miami's homegrown sushi chain, at Dadeland."],
+["Vicky Bakery","Kendall & Pinecrest","Bakery",1,4.4,"dqk",25.6870,-80.3700,"Cuban bakery for croquetas and guava pastries."],
+["Shibui","Kendall & Pinecrest","Japanese",2,4.5,"n",25.7010,-80.3510,"Long-loved Kendall Japanese with tatami rooms."],
+["Black Point Ocean Grill","Kendall & Pinecrest","Seafood",2,4.3,"wok",25.5395,-80.3280,"Marina-side fish sandwiches in Cutler Bay, with manatees in the channel."],
+// Homestead & Redland
+["Knaus Berry Farm","Homestead & Redland","Dessert",1,4.8,"dLk",25.5410,-80.5055,"Cinnamon rolls worth the line and strawberry milkshakes. Seasonal, closed Sundays."],
+["Schnebly Redland's Winery","Homestead & Redland","Pizza",2,4.5,"onk",25.5150,-80.4930,"Tropical-fruit wines and brick-oven pizza among the waterfalls."],
+["Robert Is Here","Homestead & Redland","Dessert",1,4.7,"dqLk",25.4463,-80.5085,"Fruit stand with legendary key lime and mamey milkshakes."],
+["Shiver's BBQ","Homestead & Redland","BBQ",2,4.4,"kL",25.4630,-80.4775,"Pit-smoked ribs and brisket on Krome since 1950."],
+["El Toro Taco","Homestead & Redland","Mexican",2,4.5,"kL",25.4730,-80.4770,"Family-run Mexican since 1971. Bring your own beer."],
+["Casita Tejas","Homestead & Redland","Mexican",2,4.5,"kL",25.4690,-80.4770,"Homestyle Tex-Mex on historic Krome Avenue."],
+["Rosita's Restaurante","Homestead & Redland","Mexican",1,4.5,"kL",25.4700,-80.4770,"Tiny family taqueria loved by farmworkers and locals."],
+["Burr's Berry Farm","Homestead & Redland","Dessert",1,4.7,"dk",25.5550,-80.4770,"U-pick strawberries and strawberry milkshakes. Seasonal."],
+["Capri Restaurant","Homestead & Redland","Italian",2,4.4,"kL",25.4480,-80.4790,"Florida City Italian institution since 1958."],
+["Farmers Market Restaurant","Homestead & Redland","American",1,4.4,"bkL",25.4480,-80.4780,"Diner inside the farmers market for big country breakfasts."],
+// Key Largo
 ["The Fish House","Key Largo","Seafood",2,4.5,"LkD",25.1235,-80.4108,"MM 102.4. Matecumbe-style fresh catch and homemade Key lime pie."],
 ["Mrs. Mac's Kitchen","Key Largo","American",2,4.5,"DLk",25.1060,-80.4330,"MM 99.4. License plates on the walls, Key lime pie on the table."],
 ["Snapper's","Key Largo","Seafood",2,4.3,"wobk",25.0795,-80.4495,"MM 94.5. Canal-front tiki bar; they'll cook the fish you caught."],
@@ -321,10 +475,12 @@ const R=[
 ["Key Largo Chocolates","Key Largo","Dessert",1,4.8,"dk",25.1175,-80.4175,"MM 100.5. Chocolate-dipped Key lime pie on a stick."],
 ["Señor Frijoles","Key Largo","Mexican",2,4.3,"wok",25.1290,-80.4095,"MM 103.9. Bayside Mexican with margaritas on the water."],
 ["DJ's Diner","Key Largo","American",1,4.5,"bk",25.1050,-80.4330,"MM 99.6. Big breakfasts before a day on the reef."],
-["Captain's Tavern","Pinecrest","Seafood",3,4.6,"Lkn",25.6830,-80.3130,"Family-run since the early '70s: Caribbean-leaning seafood, conch fritters and a deep wine list."],
-["Chef Adrianne's Vineyard","Kendall","American",3,4.6,"n",25.6880,-80.3960,"Chef-driven plates and a big wine list at The Palms at Town and Country."],
-["Pinecrest Bakery","Pinecrest","Bakery",1,4.5,"dqkL",25.6440,-80.3330,"Cuban bakery for pastelitos, croquetas and a quick cafecito."],
-["Lots of Lox","Palmetto Bay","Sandwiches",2,4.4,"bkL",25.6300,-80.3400,"Old-school deli for bagels, lox and overstuffed sandwiches."],
+["Hobo's Café","Key Largo","American",2,4.4,"kL",25.1210,-80.4140,"MM 101.7. Fish tacos and burgers at a classic roadside stop."],
+["Ballyhoo's","Key Largo","Seafood",2,4.5,"oL",25.0950,-80.4380,"MM 97.8. 1930s conch house serving fresh local fish."],
+["Buzzard's Roost","Key Largo","Seafood",2,4.3,"wo",25.1530,-80.3920,"MM 106.5. Marina-side grill at Garden Cove."],
+["Pilot House","Key Largo","Seafood",2,4.2,"wol",25.0870,-80.4440,"MM 99.5. Marina bar with a glass-bottom floor over the water."],
+["Jimmy Johnson's Big Chill","Key Largo","American",2,4.4,"wol",25.1310,-80.4130,"MM 104. Bayside sports bar with a big outdoor deck."],
+["Harriette's","Key Largo","American",1,4.6,"bkL",25.0880,-80.4440,"MM 95.7. Breakfast nook famous for its giant muffins."],
 ].map(([name,hood,cuisine,price,stars,t,lat,lng,blurb])=>({name,hood,cuisine,price,stars,t,lat,lng,blurb}));
 
 const STARTS=[["Fort Lauderdale",26.1224,-80.1373],["Hollywood",26.0112,-80.1495],["Aventura",25.9565,-80.1392],["North Miami",25.8901,-80.1867],
@@ -333,7 +489,9 @@ const STARTS=[["Fort Lauderdale",26.1224,-80.1373],["Hollywood",26.0112,-80.1495
 ["Doral",25.8195,-80.3553],["Kendall",25.6793,-80.3173],["Pinecrest",25.6670,-80.3080],["Cutler Bay",25.5808,-80.3468],
 ["Homestead",25.4687,-80.4776],["Key Largo",25.0865,-80.4473]];
 
-const CUIS=["American","Cuban","Seafood","Italian","Mexican","Steakhouse","Pizza","Burgers","BBQ","Asian","Japanese","Chinese","Vietnamese","Peruvian","French","Greek","Indian","Haitian","German","Southern","Sandwiches","Hot Dogs","Café","Bakery","Dessert"];
+const CC={};R.forEach(r=>CC[r.cuisine]=(CC[r.cuisine]||0)+1);
+const CUIS=Object.keys(CC).sort((a,b)=>CC[b]-CC[a]||a.localeCompare(b));
+let showAllCuis=false;
 const VIBES=[["S","Sweet Treats",1],["f","Fancy / Elegant"],["q","Fast / Quick bite"],["L","Local legend"],["w","Waterfront"],["o","Outdoor seating"],
 ["n","Date night"],["k","Family-friendly"],["b","Brunch"],["l","Late night"],["v","Veggie-friendly"],["m","Michelin-recognized"]];
 
@@ -353,12 +511,15 @@ function toggle(set,v){set.has(v)?set.delete(v):set.add(v);}
 
 function buildFilters(){
   $("start").innerHTML=[[MEL],...STARTS].map(s=>`<option ${s[0]===st.start?"selected":""}>${s[0]}</option>`).join("");
-  const hoods=[...new Set(R.map(r=>r.hood))].sort();
+  const hoods=AREAS.filter(a=>R.some(r=>r.hood===a));
   $("hood").innerHTML='<option value="">Any neighborhood</option>'+hoods.map(h=>`<option>${esc(h)}</option>`).join("");
   $("hood").value=st.hood; $("dist").value=st.dist;
-  const cu=$("cuisines");cu.innerHTML="";CUIS.forEach(c=>cu.append(chip(c,st.cuis.has(c),"",()=>toggle(st.cuis,c))));
+  const cu=$("cuisines");cu.innerHTML="";
+  CUIS.filter((c,i)=>showAllCuis||i<14||st.cuis.has(c)).forEach(c=>cu.append(chip(c,st.cuis.has(c),"",()=>toggle(st.cuis,c))));
+  const more=document.createElement("button");more.type="button";more.className="linkbtn";
+  more.textContent=showAllCuis?"Fewer":"All "+CUIS.length+" types";more.onclick=()=>{showAllCuis=!showAllCuis;buildFilters();};cu.append(more);
   const pr=$("prices");pr.innerHTML="";[1,2,3,4].forEach(p=>pr.append(chip(priceStr(p),st.price.has(p),"",()=>toggle(st.price,p))));
-  const sr=$("stars");sr.innerHTML="";[[0,"Any"],[4.3,"4.3+ ★"],[4.5,"4.5+ ★"],[4.7,"4.7+ ★"]].forEach(([v,l])=>{
+  const sr=$("stars");sr.innerHTML="";[[0,"Any"],[4,"4.0+ ★"],[4.3,"4.3+ ★"],[4.5,"4.5+ ★"],[4.7,"4.7+ ★"]].forEach(([v,l])=>{
     const b=chip(l,st.minStars===v,"",()=>{});b.onclick=()=>{st.minStars=v;[...sr.children].forEach(c=>c.setAttribute("aria-pressed",c===b));update();};sr.append(b);});
   const vb=$("vibes");vb.innerHTML="";VIBES.forEach(([k,l,s])=>vb.append(chip(l,st.vibes.has(k),s?"sweet":"",()=>toggle(st.vibes,k))));
 }
@@ -486,7 +647,7 @@ $("hood").onchange=e=>{st.hood=e.target.value;update();};
 $("reset").onclick=()=>{Object.assign(st,{dist:0,hood:"",minStars:0});st.cuis.clear();st.price.clear();st.vibes.clear();st.skip.clear();
   $("result").hidden=true;$("nopeBtn").hidden=true;buildFilters();update();};
 
-try{const s=JSON.parse(localStorage.getItem("dd")||"null");if(s){st.start=STARTS.some(z=>z[0]===s.start)?s.start:st.start;lastStart=st.start;st.dist=s.dist||0;st.hood=s.hood||"";
+try{const s=JSON.parse(localStorage.getItem("dd")||"null");if(s){st.start=STARTS.some(z=>z[0]===s.start)?s.start:st.start;lastStart=st.start;st.dist=s.dist||0;st.hood=AREAS.includes(s.hood)?s.hood:"";
   st.cuis=new Set(s.cuis||[]);st.price=new Set(s.price||[]);st.minStars=s.minStars||0;st.vibes=new Set(s.vibes||[]);}}catch(e){}
 
 $("total").textContent=R.length;
