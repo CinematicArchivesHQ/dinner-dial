@@ -224,7 +224,7 @@ footer{font-size:.8rem;color:var(--muted);max-width:68ch;text-shadow:0 1px 2px r
             <option value="10">Within 10 mi</option><option value="20">Within 20 mi</option><option value="40">Within 40 mi</option>
           </select>
         </div>
-        <p class="hint" id="distHint">Pick where you're starting from, or use your current location. Distances are straight-line miles.</p>
+        <p class="hint" id="distHint">Pick where you're starting from, or use your current location. That limits the wheel to 10 miles; change the radius anytime.</p>
       </fieldset>
 
       <fieldset>
@@ -321,6 +321,10 @@ const R=[
 ["Key Largo Chocolates","Key Largo","Dessert",1,4.8,"dk",25.1175,-80.4175,"MM 100.5. Chocolate-dipped Key lime pie on a stick."],
 ["Señor Frijoles","Key Largo","Mexican",2,4.3,"wok",25.1290,-80.4095,"MM 103.9. Bayside Mexican with margaritas on the water."],
 ["DJ's Diner","Key Largo","American",1,4.5,"bk",25.1050,-80.4330,"MM 99.6. Big breakfasts before a day on the reef."],
+["Captain's Tavern","Pinecrest","Seafood",3,4.6,"Lkn",25.6830,-80.3130,"Family-run since the early '70s: Caribbean-leaning seafood, conch fritters and a deep wine list."],
+["Chef Adrianne's Vineyard","Kendall","American",3,4.6,"n",25.6880,-80.3960,"Chef-driven plates and a big wine list at The Palms at Town and Country."],
+["Pinecrest Bakery","Pinecrest","Bakery",1,4.5,"dqkL",25.6440,-80.3330,"Cuban bakery for pastelitos, croquetas and a quick cafecito."],
+["Lots of Lox","Palmetto Bay","Sandwiches",2,4.4,"bkL",25.6300,-80.3400,"Old-school deli for bagels, lox and overstuffed sandwiches."],
 ].map(([name,hood,cuisine,price,stars,t,lat,lng,blurb])=>({name,hood,cuisine,price,stars,t,lat,lng,blurb}));
 
 const STARTS=[["Fort Lauderdale",26.1224,-80.1373],["Hollywood",26.0112,-80.1495],["Aventura",25.9565,-80.1392],["North Miami",25.8901,-80.1867],
@@ -468,12 +472,14 @@ function update2(){$("spinBtn").disabled=!pool.length;}
 $("spinBtn").onclick=spin;
 $("nopeBtn").onclick=()=>{st.skip.add($("nopeBtn").dataset.name);$("result").hidden=true;$("nopeBtn").hidden=true;update();spin();};
 let lastStart=st.start;
+// Choosing a starting point means "near here": if no radius is set yet, default to 10 miles.
+function nearby(){if(!st.dist){st.dist=10;$("dist").value="10";}}
 $("start").onchange=e=>{const v=e.target.value;
-  if(v!==MEL){st.start=lastStart=v;update();return;}
+  if(v!==MEL){st.start=lastStart=v;nearby();update();return;}
   const fail=msg=>{$("distHint").textContent=msg;e.target.value=lastStart;};
   if(!navigator.geolocation)return fail("This browser can't share your location. Pick a starting area instead.");
   $("distHint").textContent="Finding you…";
-  navigator.geolocation.getCurrentPosition(p=>{ME=[p.coords.latitude,p.coords.longitude];st.start=lastStart=MEL;
+  navigator.geolocation.getCurrentPosition(p=>{ME=[p.coords.latitude,p.coords.longitude];st.start=lastStart=MEL;nearby();
       $("distHint").textContent="Measuring from where you are now. Distances are straight-line miles.";update();},
     ()=>fail("Location is off for this site. Turn it on in your browser settings, or pick a starting area."),{timeout:10000,maximumAge:300000});};
 $("reloadApp").onclick=()=>{const u=new URL(location.href);u.searchParams.set("v",Date.now());location.replace(u.toString());};
